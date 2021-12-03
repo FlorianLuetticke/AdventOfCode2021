@@ -4,7 +4,6 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
-#include <stdexcept>
 #include <vector>
 // 1 wins on same amount
 int findMostCommonNthBit(const std::vector<std::string> input, size_t n) {
