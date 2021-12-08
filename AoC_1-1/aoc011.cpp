@@ -11,15 +11,8 @@ int main(int argc, char **argv) {
   }
   int lastDepth = std::numeric_limits<int>::max();
   int countOfLarger = 0;
-  while (!input.eof()) {
-    int depth;
-    input >> depth;
-
-    if (input.fail() || input.eof()) {
-      break;
-    }
-    std::cout << depth << ", ";
-
+  int depth;
+  while (input >> depth) {
     if (depth > lastDepth) {
       ++countOfLarger;
     }
