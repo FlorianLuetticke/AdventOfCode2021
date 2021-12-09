@@ -14,40 +14,28 @@
 class Grid {
 public:
   std::vector<int> _data;
-  int _row, _col;
+  int _row = 0, _col = 0;
   Grid(std::ifstream &input) {
-    int columns = 0;
-    int rows = 0;
     while (true) {
       std::string line;
       std::getline(input, line);
-      std::cout << line.size() << "\n";
-      if (line.size() < 5) {
+      if (line.size() < 5)
         break;
-      }
-      if (columns == 0) {
-        columns = line.size();
-      }
-      rows += 1;
+      if (_col == 0)
+        _col = line.size();
+
+      _row += 1;
       size_t startIndex = _data.size();
       for (auto val : line) {
         int number = (val - '0');
         if (number >= 0 && number < 10) {
           _data.push_back(number);
-        } else {
-          std::cout << " Error in line " << line << " with char >>" << val
-                    << "<<\n";
         }
       }
-      size_t endIndex = _data.size();
-      if (endIndex - startIndex != size_t(columns)) {
+      if (_data.size() - startIndex != size_t(_col)) {
         std::cout << " Error with size \n";
       }
     }
-    _row = rows;
-    _col = columns;
-    std::cout << _col << "x" << _row << " -> " << _col * _row << " "
-              << _data.size() << "\n";
   }
   int &value(int col, int row) { return _data[col + row * _col]; }
 
