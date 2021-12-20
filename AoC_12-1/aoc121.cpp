@@ -1,0 +1,109 @@
+#include <algorithm>
+#include <array>
+#include <bitset>
+#include <cctype>
+#include <charconv>
+#include <cstddef>
+#include <fstream>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <iterator>
+#include <map>
+#include <numeric>
+#include <set>
+#include <system_error>
+#include <vector>
+struct Cave {
+  std::vector<std::string> connectedTo;
+};
+
+struct Path {
+  std::vector<std::string> visited;
+};
+
+template <typename T>
+void printVec(const std::vector<T> &in, const std::string &sep = ",") {
+  std::cout << "{";
+  for (size_t i = 0; i < in.size(); ++i) {
+    std::cout << in[i] << (i == in.size() - 1 ? "}" : sep);
+  }
+}
+
+std::map<std::string, Cave> caveMap;
+
+std::pair<bool, std::vector<Path>>
+advancePathsIfNotAtEnd(std::vector<Path> &&in) {
+  std::vector<Path> ret;
+  bool finished = true;
+  for (auto &path : in) {
+    if (path.visited.back() == "end") {
+      std::cout << "Already finished path ";
+      printVec(path.visited);
+      std::cout << std::endl;
+      ret.push_back(std::move(path));
+    } else {
+      for (const auto &nextCave : caveMap.at(path.visited.back()).connectedTo) {
+        if (std::islower(nextCave[0]) &&
+            path.visited.end() !=
+                std::find(path.visited.begin(), path.visited.end(), nextCave)) {
+          std::cout << "ignore next cave " << nextCave
+                    << " because in visited ";
+          printVec(path.visited);
+          std::cout << std::endl;
+          continue;
+        }
+        std::cout << "add next cave " << nextCave << " to path ";
+        printVec(path.visited);
+        std::cout << std::endl;
+        ret.push_back(path);
+        ret.back().visited.push_back(nextCave);
+        if (nextCave != "end") {
+          finished = false;
+        }
+      }
+    }
+  }
+  return {finished, std::move(ret)};
+}
+
+int main(int argc, char **argv) {
+  std::ifstream input("input.txt", std::ifstream::in);
+  if (!input.is_open()) {
+    std::cout << "Error opening\n";
+    return -1;
+  }
+  std::string in;
+  while (input >> in) {
+    auto sepPos = in.find('-');
+    auto origin = in.substr(0, sepPos);
+    auto target = in.substr(sepPos + 1);
+    std::cout << "connection " << in << " from " << origin << " to " << target
+              << "\n";
+    if (origin != "end" && target != "start")
+      caveMap[origin].connectedTo.push_back(target);
+    if (target != "end" && origin != "start")
+      caveMap[target].connectedTo.push_back(origin);
+  }
+
+  std::cout << "Cave network:\n";
+  for (auto &[name, cave] : caveMap) {
+    std::cout << name << " connected to ";
+    printVec(cave.connectedTo);
+    std::cout << "\n";
+  }
+
+  std::vector<Path> curPaths(1);
+  curPaths.back().visited.push_back("start");
+  bool finished = false;
+  while (!finished) {
+    std::tie(finished, curPaths) = advancePathsIfNotAtEnd(std::move(curPaths));
+    std::cout << "After iteration: finished " << finished << " \n";
+    for (auto path : curPaths) {
+      printVec(path.visited);
+      std::cout << "\n";
+    }
+  }
+  std::cout << "Result " << curPaths.size() << "\n";
+  return 0;
+}
