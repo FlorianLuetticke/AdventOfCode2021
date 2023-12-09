@@ -1,2 +1,5 @@
 */build/
 */aoc
+**/*.cpp.d
+**/*.cpp.o
+**/aoc
