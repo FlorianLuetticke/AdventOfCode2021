@@ -3,3 +3,4 @@
 **/*.cpp.d
 **/*.cpp.o
 **/aoc
+**/*cpython-310.pyc
